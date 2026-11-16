@@ -1,0 +1,15 @@
+package com.invengest.catalog.domain.model.gateway;
+
+import com.invengest.catalog.domain.model.Categoria;
+
+import java.util.List;
+import java.util.Optional;
+
+public interface CategoriaGateway {
+    Optional<Categoria> findById(Integer idCategoria);
+    List<Categoria> findAll();
+    Categoria save(Categoria categoria);
+    boolean existsByNombre(String nombre);
+    void deleteById(Integer idCategoria);
+    boolean existsProductosByCategoriaId(Integer idCategoria);
+}
