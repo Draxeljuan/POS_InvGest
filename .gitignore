@@ -1,0 +1,40 @@
+# ==========================================
+# 1. Entorno y Secretos
+# ==========================================
+.env
+.env.*
+!.env.example
+
+# ==========================================
+# 2. Java / Spring Boot / Maven
+# (IMPORTANTE: NO ignorar mvnw ni .mvn/ para compilación portable y Docker)
+# ==========================================
+target/
+**/target/
+*.class
+*.jar
+!**/wrapper/*.jar
+*.war
+*.ear
+hs_err_pid*
+replay_pid*
+
+# ==========================================
+# 3. IDEs y Entornos de Desarrollo
+# ==========================================
+.idea/
+**/.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+.project
+.classpath
+.settings/
+
+# ==========================================
+# 4. Archivos del Sistema Operativo y Logs
+# ==========================================
+.DS_Store
+Thumbs.db
+*.log
