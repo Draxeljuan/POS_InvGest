@@ -10,6 +10,11 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.servlet.function.RouterFunction;
+import org.springframework.web.servlet.function.RouterFunctions;
+import org.springframework.web.servlet.function.ServerResponse;
+
+import java.util.Map;
 
 @Configuration
 @EnableWebSecurity
@@ -50,6 +55,7 @@ public class SecurityConfig {
                         .accessDeniedHandler(jsonAccessDeniedHandler)
                 )
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.GET, "/actuator/health").permitAll()
                         // Proyecciones internas CQRS protegidas con X-Internal-Api-Key
                         .requestMatchers("/internal/**", "/api/analytics/internal/**")
                         .hasAuthority(InternalApiKeyFilter.AUTHORITY_INTERNAL_SERVICE)
@@ -73,5 +79,12 @@ public class SecurityConfig {
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
+    }
+
+    @Bean
+    public RouterFunction<ServerResponse> actuatorHealthEndpoint() {
+        return RouterFunctions.route()
+                .GET("/actuator/health", req -> ServerResponse.ok().body(Map.of("status", "UP", "service", "analytics-service")))
+                .build();
     }
 }
