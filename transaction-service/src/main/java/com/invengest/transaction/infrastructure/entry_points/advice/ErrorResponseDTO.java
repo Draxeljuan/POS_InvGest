@@ -1,0 +1,11 @@
+package com.invengest.transaction.infrastructure.entry_points.advice;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+public record ErrorResponseDTO(
+        LocalDateTime timestamp,
+        int status,
+        String error,
+        List<String> messages
+) {}

@@ -1,0 +1,24 @@
+package com.invengest.transaction.infrastructure.entry_points.dto.request;
+
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+
+public record MovimientoInventarioRequest(
+        @NotBlank(message = "El ID del producto es obligatorio")
+        String idProducto,
+
+        @NotNull(message = "El ID del usuario es obligatorio")
+        Integer idUsuario,
+
+        @NotNull(message = "El ID del tipo de movimiento es obligatorio")
+        Integer idTipoMovimiento,
+
+        @NotNull(message = "La cantidad es obligatoria")
+        @Min(value = 1, message = "La cantidad debe ser como mínimo 1")
+        Integer cantidad,
+
+        @Size(max = 255, message = "La observación no puede exceder 255 caracteres")
+        String observacion
+) {}
