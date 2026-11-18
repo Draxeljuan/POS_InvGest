@@ -29,7 +29,7 @@ public class JsonAuthenticationEntryPoint implements AuthenticationEntryPoint {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         String json = String.format(
                 "{\"timestamp\":\"%s\",\"status\":401,\"error\":\"No Autorizado\",\"messages\":[\"%s\"]}",
-                LocalDateTime.now(ZoneId.of("UTC")),
+                LocalDateTime.now(ZoneId.of("America/Bogota")),
                 escapeJson(message)
         );
         response.getWriter().write(json);

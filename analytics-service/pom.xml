@@ -74,6 +74,12 @@
             <scope>runtime</scope>
         </dependency>
 
+        <!-- OPENFEIGN (APIs Externas: DolarAPI TRM y API Colombia Festivos) -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
+        </dependency>
+
         <!-- REPORT GENERATION (RF05 & RF17: Apache POI for Excel & OpenPDF for PDF) -->
         <dependency>
             <groupId>org.apache.poi</groupId>

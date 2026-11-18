@@ -45,12 +45,13 @@ services:
     env_file:
       - .env
     environment:
+      TZ: America/Bogota
       AUTH_SERVICE_PORT: 8081
       DB_HOST: ${DB_HOST:-postgres-invengest}
       DB_PORT: ${DB_PORT:-5432}
       DB_SCHEMA_AUTH: ${DB_SCHEMA_AUTH:-auth}
       NOTIFICATION_SERVICE_URL: ${NOTIFICATION_SERVICE_URL:-http://notification-service:8085}
-      JAVA_TOOL_OPTIONS: ${JAVA_TOOL_OPTIONS_DEFAULT:--Xms192m -Xmx384m -XX:+UseSerialGC -Xss512k}
+      JAVA_TOOL_OPTIONS: ${JAVA_TOOL_OPTIONS_DEFAULT:--Xms192m -Xmx384m -XX:+UseSerialGC -Xss512k -Duser.timezone=America/Bogota}
     expose:
       - "8081"
     mem_limit: 512m
@@ -78,9 +79,10 @@ services:
     env_file:
       - .env
     environment:
+      TZ: America/Bogota
       SERVER_PORT: 8085
       NOTIFICATION_SERVICE_PORT: 8085
-      JAVA_TOOL_OPTIONS: ${JAVA_TOOL_OPTIONS_DEFAULT:--Xms192m -Xmx384m -XX:+UseSerialGC -Xss512k}
+      JAVA_TOOL_OPTIONS: ${JAVA_TOOL_OPTIONS_DEFAULT:--Xms192m -Xmx384m -XX:+UseSerialGC -Xss512k -Duser.timezone=America/Bogota}
     expose:
       - "8085"
     mem_limit: 512m
@@ -105,6 +107,7 @@ services:
     env_file:
       - .env
     environment:
+      TZ: America/Bogota
       SERVER_PORT: 8082
       CATALOG_SERVICE_PORT: 8082
       DB_HOST: ${DB_HOST:-postgres-invengest}
@@ -114,7 +117,7 @@ services:
       AUTH_SERVICE_URL: ${AUTH_SERVICE_URL:-http://auth-service:8081}
       ANALYTICS_SERVICE_URL: ${ANALYTICS_SERVICE_URL:-http://analytics-service:8084}
       NOTIFICATION_SERVICE_URL: ${NOTIFICATION_SERVICE_URL:-http://notification-service:8085}
-      JAVA_TOOL_OPTIONS: ${JAVA_TOOL_OPTIONS_MEDIUM:--Xms256m -Xmx480m -XX:+UseSerialGC -Xss512k}
+      JAVA_TOOL_OPTIONS: ${JAVA_TOOL_OPTIONS_MEDIUM:--Xms256m -Xmx480m -XX:+UseSerialGC -Xss512k -Duser.timezone=America/Bogota}
     expose:
       - "8082"
     mem_limit: 640m
@@ -146,13 +149,14 @@ services:
     env_file:
       - .env
     environment:
+      TZ: America/Bogota
       SERVER_PORT: 8084
       ANALYTICS_SERVICE_PORT: 8084
       DB_HOST: ${DB_HOST:-postgres-invengest}
       DB_PORT: ${DB_PORT:-5432}
       DB_SCHEMA: ${DB_SCHEMA_ANALYTICS:-analytics}
       DB_SCHEMA_ANALYTICS: ${DB_SCHEMA_ANALYTICS:-analytics}
-      JAVA_TOOL_OPTIONS: ${JAVA_TOOL_OPTIONS_ANALYTICS:--Xms256m -Xmx576m -XX:+UseSerialGC -Xss512k}
+      JAVA_TOOL_OPTIONS: ${JAVA_TOOL_OPTIONS_ANALYTICS:--Xms256m -Xmx576m -XX:+UseSerialGC -Xss512k -Duser.timezone=America/Bogota -Djava.awt.headless=true}
     expose:
       - "8084"
     mem_limit: 768m
@@ -180,6 +184,7 @@ services:
     env_file:
       - .env
     environment:
+      TZ: America/Bogota
       SERVER_PORT: 8083
       TRANSACTION_SERVICE_PORT: 8083
       DB_HOST: ${DB_HOST:-postgres-invengest}
@@ -190,7 +195,7 @@ services:
       CATALOG_SERVICE_URL: ${CATALOG_SERVICE_URL:-http://catalog-service:8082}
       ANALYTICS_SERVICE_URL: ${ANALYTICS_SERVICE_URL:-http://analytics-service:8084}
       NOTIFICATION_SERVICE_URL: ${NOTIFICATION_SERVICE_URL:-http://notification-service:8085}
-      JAVA_TOOL_OPTIONS: ${JAVA_TOOL_OPTIONS_MEDIUM:--Xms256m -Xmx480m -XX:+UseSerialGC -Xss512k}
+      JAVA_TOOL_OPTIONS: ${JAVA_TOOL_OPTIONS_MEDIUM:--Xms256m -Xmx480m -XX:+UseSerialGC -Xss512k -Duser.timezone=America/Bogota}
     expose:
       - "8083"
     mem_limit: 640m
@@ -226,6 +231,7 @@ services:
     env_file:
       - .env
     environment:
+      TZ: America/Bogota
       SERVER_PORT: 8080
       GATEWAY_PORT: 8080
       API_GATEWAY_PORT: 8080
@@ -234,7 +240,7 @@ services:
       TRANSACTION_SERVICE_URL: ${TRANSACTION_SERVICE_URL:-http://transaction-service:8083}
       ANALYTICS_SERVICE_URL: ${ANALYTICS_SERVICE_URL:-http://analytics-service:8084}
       NOTIFICATION_SERVICE_URL: ${NOTIFICATION_SERVICE_URL:-http://notification-service:8085}
-      JAVA_TOOL_OPTIONS: ${JAVA_TOOL_OPTIONS_DEFAULT:--Xms192m -Xmx384m -XX:+UseSerialGC -Xss512k}
+      JAVA_TOOL_OPTIONS: ${JAVA_TOOL_OPTIONS_DEFAULT:--Xms192m -Xmx384m -XX:+UseSerialGC -Xss512k -Duser.timezone=America/Bogota}
     ports:
       - "${GATEWAY_PORT:-8080}:8080"
     mem_limit: 512m

@@ -31,7 +31,7 @@ public class LoginUseCase {
             throw new CredencialesInvalidasException(MENSAJE_CREDENCIALES_INVALIDAS);
         }
 
-        usuario.registrarUltimoAcceso(LocalDateTime.now(ZoneId.of("UTC")));
+        usuario.registrarUltimoAcceso(LocalDateTime.now(ZoneId.of("America/Bogota")));
         usuarioGateway.save(usuario);
 
         return tokenProvider.generateToken(usuario);

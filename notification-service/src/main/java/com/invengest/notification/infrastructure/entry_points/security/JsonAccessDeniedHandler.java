@@ -25,7 +25,7 @@ public class JsonAccessDeniedHandler implements AccessDeniedHandler {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         String json = String.format(
                 "{\"timestamp\":\"%s\",\"status\":403,\"error\":\"Acceso Denegado\",\"messages\":[\"No cuenta con permisos suficientes para realizar esta operación\"]}",
-                LocalDateTime.now(ZoneId.of("UTC"))
+                LocalDateTime.now(ZoneId.of("America/Bogota"))
         );
         response.getWriter().write(json);
     }

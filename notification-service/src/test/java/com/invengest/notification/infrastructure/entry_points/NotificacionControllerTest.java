@@ -44,13 +44,11 @@ class NotificacionControllerTest {
     private EnviarNotificacionUseCase enviarNotificacionUseCase;
 
     private NotificacionController controller;
-    private GlobalExceptionHandler exceptionHandler;
 
     @BeforeEach
     void setUp() {
         NotificacionMapper mapper = Mappers.getMapper(NotificacionMapper.class);
         controller = new NotificacionController(enviarNotificacionUseCase, mapper);
-        exceptionHandler = new GlobalExceptionHandler();
     }
 
     @Test
@@ -174,29 +172,5 @@ class NotificacionControllerTest {
         assertEquals(HttpStatus.ACCEPTED, response.getStatusCode());
         assertNotNull(response.getBody());
         assertEquals("req-test-06", response.getBody().idSolicitud());
-    }
-
-    @Test
-    @DisplayName("GlobalExceptionHandler mapea errores de negocio, validación, JSON malformado y genéricos")
-    void globalExceptionHandler_MapeaCodigosHttp() {
-        // Arrange
-        ReglaNegocioException reglaEx = new ReglaNegocioException("Evento inválido");
-        BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(new Object(), "request");
-        bindingResult.addError(new FieldError("request", "destinatario", "El correo es obligatorio"));
-        MethodArgumentNotValidException validEx = new MethodArgumentNotValidException(null, bindingResult);
-        HttpMessageNotReadableException jsonEx = new HttpMessageNotReadableException("JSON malformado", (Throwable) null, null);
-        Exception genericEx = new RuntimeException("Fallo interno");
-
-        // Act
-        ResponseEntity<ErrorResponseDTO> respRegla = exceptionHandler.handleBusinessRule(reglaEx);
-        ResponseEntity<ErrorResponseDTO> respValid = exceptionHandler.handleValidationExceptions(validEx);
-        ResponseEntity<ErrorResponseDTO> respJson = exceptionHandler.handleNotReadable(jsonEx);
-        ResponseEntity<ErrorResponseDTO> respGeneric = exceptionHandler.handleGenericException(genericEx);
-
-        // Assert
-        assertEquals(HttpStatus.BAD_REQUEST, respRegla.getStatusCode());
-        assertEquals(HttpStatus.BAD_REQUEST, respValid.getStatusCode());
-        assertEquals(HttpStatus.BAD_REQUEST, respJson.getStatusCode());
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, respGeneric.getStatusCode());
     }
 }

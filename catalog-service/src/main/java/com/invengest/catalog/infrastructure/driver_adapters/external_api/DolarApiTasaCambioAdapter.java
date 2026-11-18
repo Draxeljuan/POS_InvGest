@@ -11,13 +11,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestClient;
 
 import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeParseException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicReference;
@@ -26,11 +26,11 @@ import java.util.concurrent.atomic.AtomicReference;
 public class DolarApiTasaCambioAdapter implements TasaCambioGateway {
 
     private static final Logger log = LoggerFactory.getLogger(DolarApiTasaCambioAdapter.class);
+    private static final ZoneId ZONA_BOGOTA = ZoneId.of("America/Bogota");
 
     private record EntradaCacheTrm(BigDecimal valorCopPorUsd, LocalDate fechaVigencia, Instant actualizadoEn) {}
 
-    private final RestClient restClient;
-    private final String dolarApiUrl;
+    private final DolarApiFeignClient dolarApiFeignClient;
     private final long cacheTtlSeconds;
     private final boolean preloadEnabled;
     private final Clock clock;
@@ -38,21 +38,18 @@ public class DolarApiTasaCambioAdapter implements TasaCambioGateway {
 
     @Autowired
     public DolarApiTasaCambioAdapter(
-            RestClient dolarApiRestClient,
-            @Value("${dolar.api.url:https://co.dolarapi.com/v1/trm}") String dolarApiUrl,
+            DolarApiFeignClient dolarApiFeignClient,
             @Value("${trm.cache.ttl-seconds:3600}") long cacheTtlSeconds,
             @Value("${trm.cache.preload-enabled:true}") boolean preloadEnabled) {
-        this(dolarApiRestClient, dolarApiUrl, cacheTtlSeconds, preloadEnabled, Clock.systemUTC());
+        this(dolarApiFeignClient, cacheTtlSeconds, preloadEnabled, Clock.system(ZONA_BOGOTA));
     }
 
     public DolarApiTasaCambioAdapter(
-            RestClient restClient,
-            String dolarApiUrl,
+            DolarApiFeignClient dolarApiFeignClient,
             long cacheTtlSeconds,
             boolean preloadEnabled,
             Clock clock) {
-        this.restClient = restClient;
-        this.dolarApiUrl = dolarApiUrl;
+        this.dolarApiFeignClient = dolarApiFeignClient;
         this.cacheTtlSeconds = cacheTtlSeconds;
         this.preloadEnabled = preloadEnabled;
         this.clock = clock;
@@ -69,9 +66,9 @@ public class DolarApiTasaCambioAdapter implements TasaCambioGateway {
     public void ejecutarPrecargaSegura() {
         try {
             obtenerTrmVigente();
-            log.info("trm_cache_precargada url={}", dolarApiUrl);
+            log.info("trm_cache_precargada cliente=dolar-api");
         } catch (RuntimeException ex) {
-            log.warn("trm_cache_precarga_omitida url={} causa={}", dolarApiUrl, ex.getMessage());
+            log.warn("trm_cache_precarga_omitida cliente=dolar-api causa={}", ex.getMessage());
         }
     }
 
@@ -85,10 +82,7 @@ public class DolarApiTasaCambioAdapter implements TasaCambioGateway {
         }
 
         try {
-            DolarApiTrmResponseDTO respuesta = restClient.get()
-                    .uri(dolarApiUrl)
-                    .retrieve()
-                    .body(DolarApiTrmResponseDTO.class);
+            DolarApiTrmResponseDTO respuesta = dolarApiFeignClient.obtenerTrmActual();
 
             if (respuesta == null || respuesta.valor() == null || respuesta.valor().compareTo(BigDecimal.ZERO) <= 0) {
                 throw new ServicioExternoNoDisponibleException("Respuesta inválida desde DolarAPI TRM.");
@@ -101,11 +95,11 @@ public class DolarApiTasaCambioAdapter implements TasaCambioGateway {
             return new TasaCambio(nuevaEntrada.valorCopPorUsd(), nuevaEntrada.fechaVigencia(), TasaCambio.FUENTE_API_LIVE);
         } catch (RuntimeException ex) {
             if (actual != null) {
-                log.warn("trm_api_fallo_usando_cache_stale url={} valorPrevio={} causa={}",
-                        dolarApiUrl, actual.valorCopPorUsd(), ex.getMessage());
+                log.warn("trm_api_fallo_usando_cache_stale valorPrevio={} causa={}",
+                        actual.valorCopPorUsd(), ex.getMessage());
                 return new TasaCambio(actual.valorCopPorUsd(), actual.fechaVigencia(), TasaCambio.FUENTE_CACHE_STALE);
             }
-            log.error("trm_api_no_disponible_sin_cache url={} causa={}", dolarApiUrl, ex.getMessage());
+            log.error("trm_api_no_disponible_sin_cache causa={}", ex.getMessage());
             throw new ServicioExternoNoDisponibleException(
                     "No fue posible obtener la TRM vigente desde DolarAPI y no existe valor en caché.", ex);
         }

@@ -2,15 +2,14 @@ package com.invengest.transaction.infrastructure.driver_adapters.feign;
 
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
+import feign.Target;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
-import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-@Component
 public class InternalFeignRequestInterceptor implements RequestInterceptor {
 
     public static final String HEADER_INTERNAL_API_KEY = "X-Internal-Api-Key";
@@ -23,6 +22,11 @@ public class InternalFeignRequestInterceptor implements RequestInterceptor {
 
     @Override
     public void apply(RequestTemplate template) {
+        Target<?> target = template.feignTarget();
+        if (target != null && target.name() != null && target.name().endsWith("-api")) {
+            return;
+        }
+
         if (internalApiKey != null && !internalApiKey.isBlank()) {
             template.header(HEADER_INTERNAL_API_KEY, internalApiKey);
         }

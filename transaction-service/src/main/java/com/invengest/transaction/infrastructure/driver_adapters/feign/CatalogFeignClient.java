@@ -12,7 +12,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 
-@FeignClient(name = "catalog-service", url = "${catalog.service.url:http://localhost:8082}")
+@FeignClient(
+        name = "catalog-service",
+        url = "${catalog.service.url:http://localhost:8082}",
+        configuration = InternalFeignRequestInterceptor.class
+)
 public interface CatalogFeignClient {
 
     @PostMapping("/internal/productos/validar-stock")

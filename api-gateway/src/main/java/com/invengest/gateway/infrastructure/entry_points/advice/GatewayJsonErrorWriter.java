@@ -11,9 +11,12 @@ import reactor.core.publisher.Mono;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @Component
 public class GatewayJsonErrorWriter {
+
+    private static final ZoneId ZONA_BOGOTA = ZoneId.of("America/Bogota");
 
     public Mono<Void> writeError(ServerWebExchange exchange, HttpStatus status, String message) {
         ServerHttpResponse response = exchange.getResponse();
@@ -25,7 +28,7 @@ public class GatewayJsonErrorWriter {
 
         String path = exchange.getRequest().getURI().getPath();
         String jsonBody = construirJson(
-                LocalDateTime.now().toString(),
+                LocalDateTime.now(ZONA_BOGOTA).toString(),
                 status.value(),
                 status.getReasonPhrase(),
                 message != null ? message : status.getReasonPhrase(),
@@ -38,12 +41,14 @@ public class GatewayJsonErrorWriter {
     }
 
     public String construirJson(String timestamp, int status, String error, String message, String path) {
+        String msgEscapado = escaparJson(message);
         return String.format(
-                "{\"timestamp\":\"%s\",\"status\":%d,\"error\":\"%s\",\"message\":\"%s\",\"path\":\"%s\"}",
+                "{\"timestamp\":\"%s\",\"status\":%d,\"error\":\"%s\",\"messages\":[\"%s\"],\"message\":\"%s\",\"path\":\"%s\"}",
                 escaparJson(timestamp),
                 status,
                 escaparJson(error),
-                escaparJson(message),
+                msgEscapado,
+                msgEscapado,
                 escaparJson(path)
         );
     }

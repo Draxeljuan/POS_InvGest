@@ -8,7 +8,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 @FeignClient(
         name = "notification-service",
-        url = "${notification.service.url:http://localhost:8085}"
+        url = "${notification.service.url:http://localhost:8085}",
+        configuration = InternalFeignRequestInterceptor.class
 )
 public interface NotificationFeignClient {
 

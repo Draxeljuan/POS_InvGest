@@ -4,8 +4,6 @@ import com.invengest.gateway.domain.exception.AccesoRutaInternaProhibidoExceptio
 import com.invengest.gateway.domain.exception.TokenInvalidoException;
 import com.invengest.gateway.domain.usecase.EvaluarAccesoGatewayUseCase;
 import com.invengest.gateway.infrastructure.entry_points.advice.GatewayJsonErrorWriter;
-import org.springframework.cloud.gateway.filter.GatewayFilterChain;
-import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -13,10 +11,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
+import org.springframework.web.server.WebFilter;
+import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
 
 @Component
-public class JwtAuthenticationGlobalFilter implements GlobalFilter, Ordered {
+public class JwtAuthenticationGlobalFilter implements WebFilter, Ordered {
 
     public static final int FILTER_ORDER = -50;
 
@@ -31,7 +31,7 @@ public class JwtAuthenticationGlobalFilter implements GlobalFilter, Ordered {
     }
 
     @Override
-    public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+    public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
         ServerHttpRequest request = exchange.getRequest();
         HttpMethod httpMethod = request.getMethod();
         String method = httpMethod != null ? httpMethod.name() : "GET";

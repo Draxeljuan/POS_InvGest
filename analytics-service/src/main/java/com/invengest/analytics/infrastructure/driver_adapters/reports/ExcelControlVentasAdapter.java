@@ -18,11 +18,14 @@ import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 @Component
@@ -36,6 +39,25 @@ public class ExcelControlVentasAdapter implements ReporteExcelGateway {
             "CONTROL CLASES",
             "NOTAS"
     };
+
+    @EventListener(ApplicationReadyEvent.class)
+    public void calentarMotorPoiAlIniciar() {
+        System.setProperty("java.awt.headless", "true");
+        ReporteMensualVentas reporteSemilla = ReporteMensualVentas.builder()
+                .anio(2026)
+                .mes(1)
+                .nombreMes("ENERO")
+                .tituloCabecera("WARMUP")
+                .filas(List.of(FilaControlVentas.builder()
+                        .fecha(LocalDate.of(2026, 1, 1))
+                        .fechaFormateada("ene-01")
+                        .ventasDiarias(BigDecimal.ZERO)
+                        .acumuladoVentas(BigDecimal.ZERO)
+                        .build()))
+                .totalMes(BigDecimal.ZERO)
+                .build();
+        generarReporteControlVentas(reporteSemilla);
+    }
 
     @Override
     public byte[] generarReporteControlVentas(ReporteMensualVentas reporte) {

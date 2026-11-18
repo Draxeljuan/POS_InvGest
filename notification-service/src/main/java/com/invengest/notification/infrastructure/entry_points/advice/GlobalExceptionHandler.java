@@ -5,9 +5,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -16,9 +18,29 @@ import java.util.List;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    private static final ZoneId ZONA_BOGOTA = ZoneId.of("America/Bogota");
+
     @ExceptionHandler(ReglaNegocioException.class)
     public ResponseEntity<ErrorResponseDTO> handleBusinessRule(ReglaNegocioException ex) {
         return buildResponse(HttpStatus.BAD_REQUEST, "Violación de Regla de Negocio", List.of(ex.getMessage()));
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<ErrorResponseDTO> handleNoResourceFound(NoResourceFoundException ex) {
+        return buildResponse(
+                HttpStatus.NOT_FOUND,
+                "Recurso No Encontrado",
+                List.of("La ruta solicitada no existe: /" + ex.getResourcePath())
+        );
+    }
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<ErrorResponseDTO> handleMethodNotSupported(HttpRequestMethodNotSupportedException ex) {
+        return buildResponse(
+                HttpStatus.METHOD_NOT_ALLOWED,
+                "Método No Permitido",
+                List.of("El método HTTP " + ex.getMethod() + " no está soportado para esta ruta")
+        );
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -51,7 +73,7 @@ public class GlobalExceptionHandler {
 
     private ResponseEntity<ErrorResponseDTO> buildResponse(HttpStatus status, String error, List<String> messages) {
         ErrorResponseDTO body = new ErrorResponseDTO(
-                LocalDateTime.now(ZoneId.of("UTC")),
+                LocalDateTime.now(ZONA_BOGOTA),
                 status.value(),
                 error,
                 messages
